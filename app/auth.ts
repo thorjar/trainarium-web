@@ -58,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			// On initial credentials sign-in
 			if (user) {
 				token.id = user.id;
-				token.apiToken = (user as any).apiToken;
+				token.token = (user as any).apiToken;
 			}
 
 			// On OAuth sign-in — sync with backend
@@ -77,7 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					if (response.ok) {
 						const data = await response.json();
 						token.id = data.user.id;
-						token.apiToken = data.token; // your sync-user route needs to return token too
+						token.token = data.token; // your sync-user route needs to return token too
 					}
 				} catch (error) {
 					console.error('Failed to sync user with backend:', error);
@@ -91,7 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			if (session.user) {
 				session.user.id = token.id as string;
 			}
-			session.apiToken = token.apiToken as string;
+			(session as any).token = token.token as string;
 			return session;
 		},
 	},
