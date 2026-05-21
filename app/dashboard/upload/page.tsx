@@ -14,6 +14,8 @@ import {
 	Lock,
 	Users,
 	Globe,
+	ChevronDown,
+	ChevronUp,
 } from 'lucide-react';
 import Papa from 'papaparse';
 import { datasetApi } from '@/lib/api-client';
@@ -26,24 +28,24 @@ const VISIBILITY_OPTIONS = [
 		label: 'Private',
 		desc: 'Only you can see and label this dataset',
 		icon: Lock,
-		color: 'border-slate-300 bg-slate-50 text-slate-700',
-		activeColor: 'border-slate-600 bg-slate-100 text-slate-900',
+		bg: 'bg-slate-50 border-slate-200',
+		activeBg: 'bg-slate-100 border-slate-600 ring-2 ring-slate-600/20',
 	},
 	{
 		value: 'TEAM' as Visibility,
 		label: 'Team',
 		desc: 'Invite specific people to label this dataset',
 		icon: Users,
-		color: 'border-blue-200 bg-blue-50 text-blue-700',
-		activeColor: 'border-blue-500 bg-blue-100 text-blue-900',
+		bg: 'bg-blue-50 border-blue-200',
+		activeBg: 'bg-blue-100 border-blue-500 ring-2 ring-blue-500/20',
 	},
 	{
 		value: 'PUBLIC' as Visibility,
 		label: 'Public',
 		desc: 'Anyone on Trainarium can label and verify',
 		icon: Globe,
-		color: 'border-teal-200 bg-teal-50 text-teal-700',
-		activeColor: 'border-teal-500 bg-teal-100 text-teal-900',
+		bg: 'bg-teal-50 border-teal-200',
+		activeBg: 'bg-teal-100 border-teal-500 ring-2 ring-teal-500/20',
 	},
 ];
 
@@ -157,21 +159,24 @@ export default function UploadDataPage() {
 	};
 
 	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='border-b border-slate-200 bg-white'>
-				<div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen'>
+			{/* Header */}
+			<div className='section-header'>
+				<div className='section-container py-8'>
 					<div className='flex items-center gap-3 mb-2'>
-						<Upload className='w-8 h-8 text-teal-600' />
-						<h1 className='text-3xl font-bold text-slate-900'>Upload Data</h1>
+						<div className='w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20'>
+							<Upload className='w-5 h-5 text-white' />
+						</div>
+						<h1 className='page-title'>Upload Data</h1>
 					</div>
-					<p className='text-slate-600'>
+					<p className='page-subtitle'>
 						Create a new labeling project by uploading your dataset
 					</p>
 				</div>
 			</div>
 
-			<div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-				<Card className='mb-8'>
+			<div className='section-container py-8'>
+				<Card>
 					<CardHeader
 						title='Dataset Information'
 						description='Provide details about your dataset'
@@ -179,14 +184,15 @@ export default function UploadDataPage() {
 					<CardBody>
 						<form onSubmit={handleSubmit} className='space-y-6'>
 							{error && (
-								<div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-3'>
+								<div className='bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl flex items-start gap-3'>
 									<AlertCircle className='w-5 h-5 mt-0.5 flex-shrink-0' />
-									<span>{error}</span>
+									<span className='text-sm'>{error}</span>
 								</div>
 							)}
 							{success && (
-								<div className='bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg'>
-									✓ {success}
+								<div className='bg-green-50 border border-green-200 text-green-700 px-5 py-3 rounded-xl text-sm flex items-center gap-2'>
+									<svg className='w-5 h-5 flex-shrink-0' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg>
+									{success}
 								</div>
 							)}
 
@@ -212,7 +218,7 @@ export default function UploadDataPage() {
 									value={description}
 									onChange={e => setDescription(e.target.value)}
 									placeholder='Describe what this dataset contains and how it should be labeled...'
-									className='input-field resize-none'
+									className='textarea-field'
 									rows={3}
 								/>
 							</div>
@@ -231,12 +237,12 @@ export default function UploadDataPage() {
 												key={opt.value}
 												type='button'
 												onClick={() => setVisibility(opt.value)}
-												className={`p-4 rounded-lg border-2 text-left transition-all ${isActive ? opt.activeColor + ' border-2' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+												className={`p-4 rounded-xl border-2 text-left transition-all ${
+													isActive ? opt.activeBg : 'border-slate-200 bg-white hover:border-slate-300'
+												}`}
 											>
-												<Icon
-													className={`w-5 h-5 mb-2 ${isActive ? '' : 'text-slate-400'}`}
-												/>
-												<div className='font-medium text-sm'>{opt.label}</div>
+												<Icon className={`w-5 h-5 mb-2 ${isActive ? '' : 'text-slate-400'}`} />
+												<div className='font-medium text-sm text-slate-900'>{opt.label}</div>
 												<div className='text-xs text-slate-500 mt-0.5'>
 													{opt.desc}
 												</div>
@@ -245,16 +251,16 @@ export default function UploadDataPage() {
 									})}
 								</div>
 								{visibility === 'PUBLIC' && (
-									<p className='text-xs text-teal-700 bg-teal-50 border border-teal-200 rounded-lg px-3 py-2 mt-2'>
-										Public datasets appear in the community labeling queue.
-										Anyone can label and verify your data and earn rewards.
-									</p>
+									<div className='flex items-start gap-3 text-xs text-teal-700 bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 mt-3'>
+										<Globe className='w-4 h-4 mt-0.5 flex-shrink-0' />
+										Public datasets appear in the community labeling queue. Anyone can label and verify your data and earn rewards.
+									</div>
 								)}
 								{visibility === 'TEAM' && (
-									<p className='text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mt-2'>
-										After creating, you can invite team members by email from
-										the dataset settings page.
-									</p>
+									<div className='flex items-start gap-3 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mt-3'>
+										<Users className='w-4 h-4 mt-0.5 flex-shrink-0' />
+										After creating, you can invite team members by email from the dataset settings page.
+									</div>
 								)}
 							</div>
 
@@ -271,7 +277,7 @@ export default function UploadDataPage() {
 										{labelClasses.map(label => (
 											<span
 												key={label}
-												className='flex items-center gap-1 bg-teal-50 border border-teal-200 text-teal-800 text-sm px-3 py-1 rounded-full'
+												className='badge-teal'
 											>
 												{label}
 												<button
@@ -305,7 +311,7 @@ export default function UploadDataPage() {
 										type='button'
 										onClick={addLabelClass}
 										disabled={!labelInput.trim()}
-										className='btn-secondary flex items-center gap-1 disabled:opacity-50'
+										className='btn-secondary flex items-center gap-1.5 disabled:opacity-50'
 									>
 										<Plus className='w-4 h-4' /> Add
 									</button>
@@ -317,14 +323,15 @@ export default function UploadDataPage() {
 								<button
 									type='button'
 									onClick={() => setShowAdvanced(p => !p)}
-									className='text-sm text-slate-500 hover:text-slate-700 underline'
+									className='flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors'
 								>
+									{showAdvanced ? <ChevronUp className='w-4 h-4' /> : <ChevronDown className='w-4 h-4' />}
 									{showAdvanced ? 'Hide' : 'Show'} advanced settings
 								</button>
 								{showAdvanced && (
-									<div className='mt-4 grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200'>
+									<div className='mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 bg-slate-50 rounded-xl border border-slate-200'>
 										<div>
-											<label className='block text-sm font-medium text-slate-900 mb-1'>
+											<label className='block text-sm font-medium text-slate-900 mb-1.5'>
 												Reward per item (USD)
 											</label>
 											<input
@@ -335,12 +342,12 @@ export default function UploadDataPage() {
 												onChange={e => setRewardPerItem(e.target.value)}
 												className='input-field'
 											/>
-											<p className='text-xs text-slate-500 mt-1'>
+											<p className='text-xs text-slate-500 mt-1.5'>
 												Amount paid to labelers per approved label
 											</p>
 										</div>
 										<div>
-											<label className='block text-sm font-medium text-slate-900 mb-1'>
+											<label className='block text-sm font-medium text-slate-900 mb-1.5'>
 												Consensus required
 											</label>
 											<input
@@ -351,7 +358,7 @@ export default function UploadDataPage() {
 												onChange={e => setConsensusRequired(e.target.value)}
 												className='input-field'
 											/>
-											<p className='text-xs text-slate-500 mt-1'>
+											<p className='text-xs text-slate-500 mt-1.5'>
 												Verifications needed to approve a label
 											</p>
 										</div>
@@ -364,7 +371,10 @@ export default function UploadDataPage() {
 								<label className='block text-sm font-medium text-slate-900 mb-3'>
 									Upload File *
 								</label>
-								<div className='border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-teal-500 transition-colors'>
+								<div
+									className='border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:border-teal-500 transition-all duration-200 hover:bg-teal-50/30 cursor-pointer'
+									onClick={() => document.getElementById('file-input')?.click()}
+								>
 									<input
 										type='file'
 										onChange={handleFileChange}
@@ -372,15 +382,14 @@ export default function UploadDataPage() {
 										id='file-input'
 										className='hidden'
 									/>
-									<label
-										htmlFor='file-input'
-										className='cursor-pointer flex flex-col items-center'
-									>
-										<FileUp className='w-12 h-12 text-slate-400 mb-3' />
+									<label htmlFor='file-input' className='cursor-pointer flex flex-col items-center'>
+										<div className='w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors'>
+											<FileUp className='w-8 h-8 text-slate-400' />
+										</div>
 										<span className='font-medium text-slate-900'>
 											{file ? file.name : 'Click to upload or drag and drop'}
 										</span>
-										<span className='text-sm text-slate-600 mt-1'>
+										<span className='text-sm text-slate-500 mt-1'>
 											CSV or JSON files
 										</span>
 									</label>
@@ -392,14 +401,14 @@ export default function UploadDataPage() {
 									<label className='block text-sm font-medium text-slate-900 mb-3'>
 										Preview (First 5 rows)
 									</label>
-									<div className='overflow-x-auto rounded-lg border border-slate-200'>
+									<div className='overflow-x-auto rounded-xl border border-slate-200'>
 										<table className='w-full text-sm'>
 											<thead>
 												<tr className='border-b border-slate-200 bg-slate-50'>
 													{Object.keys(preview[0]).map(key => (
 														<th
 															key={key}
-															className='px-4 py-2 text-left font-medium text-slate-900'
+															className='px-4 py-3 text-left font-medium text-slate-700'
 														>
 															{key}
 														</th>
@@ -413,7 +422,7 @@ export default function UploadDataPage() {
 														className='border-b border-slate-100 hover:bg-slate-50'
 													>
 														{Object.values(row).map((value: any, i) => (
-															<td key={i} className='px-4 py-2 text-slate-600'>
+															<td key={i} className='px-4 py-2.5 text-slate-600'>
 																{String(value).substring(0, 50)}
 																{String(value).length > 50 ? '...' : ''}
 															</td>
@@ -426,7 +435,7 @@ export default function UploadDataPage() {
 								</div>
 							)}
 
-							<div className='flex justify-end gap-4 pt-4 border-t border-slate-200'>
+							<div className='flex justify-end gap-3 pt-4 border-t border-slate-100'>
 								<button
 									type='button'
 									className='btn-secondary'

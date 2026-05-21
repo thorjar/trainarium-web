@@ -9,22 +9,26 @@ const RANKS = [
 	{
 		label: 'Expert',
 		min: 200,
-		color: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+		gradient: 'from-amber-400 to-orange-500',
+		badge: 'bg-amber-100 text-amber-700 border-amber-200',
 	},
 	{
 		label: 'Senior',
 		min: 150,
-		color: 'text-purple-600 bg-purple-50 border-purple-200',
+		gradient: 'from-purple-400 to-purple-600',
+		badge: 'bg-purple-100 text-purple-700 border-purple-200',
 	},
 	{
 		label: 'Regular',
 		min: 100,
-		color: 'text-teal-600 bg-teal-50 border-teal-200',
+		gradient: 'from-teal-400 to-teal-600',
+		badge: 'bg-teal-100 text-teal-700 border-teal-200',
 	},
 	{
 		label: 'Newcomer',
 		min: 0,
-		color: 'text-slate-600 bg-slate-50 border-slate-200',
+		gradient: 'from-slate-400 to-slate-500',
+		badge: 'bg-slate-100 text-slate-600 border-slate-200',
 	},
 ];
 
@@ -62,15 +66,15 @@ export default function ReputationPage() {
 
 	if (loading)
 		return (
-			<div className='p-10 text-center'>
-				<Loader className='animate-spin mx-auto mb-2' />
-				<p className='text-slate-600'>Loading reputation...</p>
+			<div className='text-center py-24'>
+				<Loader className='w-8 h-8 animate-spin mx-auto mb-4 text-teal-600' />
+				<p className='text-slate-500'>Loading reputation...</p>
 			</div>
 		);
 
 	if (error)
 		return (
-			<div className='p-6'>
+			<div className='section-container py-12'>
 				<Card className='border-red-200 bg-red-50'>
 					<CardBody>
 						<p className='text-red-700'>{error}</p>
@@ -83,55 +87,57 @@ export default function ReputationPage() {
 	const rank = getRank(score);
 	const nextRank = RANKS.find(r => r.min > score);
 	const pointsToNext = nextRank ? nextRank.min - score : null;
+	const currentMin = RANKS.find(r => r.min <= score && (!RANKS[RANKS.indexOf(r) - 1] || RANKS[RANKS.indexOf(r) - 1].min > score))?.min ?? 0;
+	const progressInRank = nextRank ? Math.min(100, ((score - currentMin) / (nextRank.min - currentMin)) * 100) : 100;
 
 	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='border-b border-slate-200 bg-white'>
-				<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen'>
+			{/* Header */}
+			<div className='section-header'>
+				<div className='section-container py-8'>
 					<div className='flex items-center gap-3 mb-2'>
-						<Star className='w-8 h-8 text-yellow-500' />
-						<h1 className='text-3xl font-bold text-slate-900'>Reputation</h1>
+						<div className='w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20'>
+							<Star className='w-5 h-5 text-white' />
+						</div>
+						<h1 className='page-title'>Reputation</h1>
 					</div>
-					<p className='text-slate-600'>
+					<p className='page-subtitle'>
 						Your standing in the Trainarium community
 					</p>
 				</div>
 			</div>
 
-			<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6'>
+			<div className='section-container py-8 space-y-6'>
 				{/* My reputation card */}
 				<Card>
 					<CardBody>
-						<div className='flex items-center gap-6'>
-							<div className='w-20 h-20 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0'>
+						<div className='flex flex-col sm:flex-row items-start sm:items-center gap-6'>
+							<div className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${rank.gradient} flex items-center justify-center text-white text-3xl font-bold flex-shrink-0 shadow-lg`}>
 								{score}
 							</div>
-							<div className='flex-1'>
-								<div className='flex items-center gap-2 mb-1'>
-									<span
-										className={`text-sm font-semibold px-3 py-1 rounded-full border ${rank.color}`}
-									>
+							<div className='flex-1 w-full'>
+								<div className='flex items-center gap-2.5 mb-1'>
+									<span className={`text-sm font-semibold px-3 py-1 rounded-full border ${rank.badge}`}>
 										{rank.label}
 									</span>
 								</div>
-								<p className='text-slate-600 text-sm mb-3'>
+								<p className='text-slate-500 text-sm mb-4'>
 									{pointsToNext
 										? `${pointsToNext} points until ${nextRank?.label}`
-										: 'You have reached the highest rank!'}
+										: '🏆 You have reached the highest rank!'}
 								</p>
 								{/* Progress bar to next rank */}
 								{nextRank && (
 									<div>
-										<div className='flex justify-between text-xs text-slate-500 mb-1'>
-											<span>{score}</span>
-											<span>{nextRank.min}</span>
+										<div className='flex justify-between text-xs text-slate-500 mb-1.5'>
+											<span>{currentMin} pts</span>
+											<span className='font-medium text-slate-700'>{rank.label}</span>
+											<span>{nextRank.min} pts</span>
 										</div>
-										<div className='w-full bg-slate-200 rounded-full h-2'>
+										<div className='progress-bar h-2.5'>
 											<div
-												className='bg-teal-500 h-2 rounded-full transition-all'
-												style={{
-													width: `${Math.min(100, ((score - (RANKS.find(r => r.min <= score && (!RANKS[RANKS.indexOf(r) - 1] || RANKS[RANKS.indexOf(r) - 1].min > score))?.min ?? 0)) / (nextRank.min - (RANKS.find(r => r.min <= score)?.min ?? 0))) * 100)}%`,
-												}}
+												className={`progress-fill bg-gradient-to-r ${rank.gradient}`}
+												style={{ width: `${progressInRank}%` }}
 											/>
 										</div>
 									</div>
@@ -151,34 +157,40 @@ export default function ReputationPage() {
 									action: 'Label approved by consensus',
 									points: '+2',
 									color: 'text-green-600',
+									bg: 'bg-green-50 border-green-200',
 								},
 								{
 									action: 'Verification submitted',
 									points: '+1',
 									color: 'text-teal-600',
+									bg: 'bg-teal-50 border-teal-200',
 								},
 								{
 									action: 'Label rejected by consensus',
 									points: '-5',
 									color: 'text-red-600',
+									bg: 'bg-red-50 border-red-200',
 								},
 							].map(item => (
 								<div
 									key={item.action}
-									className='flex items-center justify-between p-3 bg-slate-50 rounded-lg'
+									className={`flex items-center justify-between p-4 rounded-xl border ${item.bg}`}
 								>
-									<p className='text-sm text-slate-700'>{item.action}</p>
-									<span className={`font-bold text-sm ${item.color}`}>
+									<p className='text-sm text-slate-700 font-medium'>{item.action}</p>
+									<span className={`font-bold text-sm ${item.color} ml-3 flex-shrink-0`}>
 										{item.points}
 									</span>
 								</div>
 							))}
 						</div>
-						<div className='mt-4 p-3 bg-teal-50 border border-teal-200 rounded-lg'>
-							<p className='text-sm text-teal-800'>
-								Higher reputation unlocks premium datasets with higher pay rates
-								and priority task assignment.
-							</p>
+						<div className='mt-5 p-4 bg-teal-50 border border-teal-200 rounded-xl'>
+							<div className='flex items-start gap-3'>
+								<Trophy className='w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0' />
+								<p className='text-sm text-teal-800'>
+									Higher reputation unlocks premium datasets with higher pay rates
+									and priority task assignment.
+								</p>
+							</div>
 						</div>
 					</CardBody>
 				</Card>
@@ -187,30 +199,33 @@ export default function ReputationPage() {
 				<Card>
 					<CardHeader
 						title='Leaderboard'
-						description='Top 20 labelers by reputation score'
+						description='Top labelers by reputation score'
 					/>
-					<CardBody>
+					<CardBody className='p-0'>
 						{leaderboard.length === 0 ? (
-							<p className='text-slate-500 text-center py-8'>
-								No data yet — be the first to label!
-							</p>
+							<div className='text-center py-12'>
+								<div className='w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+									<Trophy className='w-7 h-7 text-slate-400' />
+								</div>
+								<p className='text-slate-500'>No data yet — be the first to label!</p>
+							</div>
 						) : (
-							<div className='space-y-2'>
+							<div className='divide-y divide-slate-100'>
 								{leaderboard.map((entry: any, index: number) => {
 									const isMe = entry.user?.id === userId;
 									const entryRank = getRank(entry.score);
 									return (
 										<div
 											key={entry.id}
-											className={`flex items-center gap-4 p-3 rounded-lg border ${
-												isMe ? 'border-teal-300 bg-teal-50' : 'border-slate-200'
+											className={`flex items-center gap-4 px-6 py-4 ${
+												isMe ? 'bg-teal-50/50' : ''
 											}`}
 										>
 											{/* Position */}
 											<div
-												className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+												className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
 													index === 0
-														? 'bg-yellow-100 text-yellow-700'
+														? 'bg-amber-100 text-amber-700'
 														: index === 1
 															? 'bg-slate-200 text-slate-700'
 															: index === 2
@@ -230,34 +245,34 @@ export default function ReputationPage() {
 												<img
 													src={entry.user.image}
 													alt=''
-													className='w-8 h-8 rounded-full flex-shrink-0'
+													className='w-9 h-9 rounded-full flex-shrink-0 ring-2 ring-slate-100'
 												/>
 											) : (
-												<div className='w-8 h-8 rounded-full bg-teal-200 flex items-center justify-center text-teal-700 text-sm font-bold flex-shrink-0'>
+												<div className='w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-sm font-bold flex-shrink-0 ring-2 ring-teal-50'>
 													{entry.user?.name?.[0] ?? '?'}
 												</div>
 											)}
 
 											{/* Name */}
 											<div className='flex-1 min-w-0'>
-												<p className='font-medium text-slate-900 truncate'>
-													{entry.user?.name ?? 'Anonymous'}
+												<div className='flex items-center gap-2'>
+													<p className='font-medium text-slate-900 truncate'>
+														{entry.user?.name ?? 'Anonymous'}
+													</p>
 													{isMe && (
-														<span className='ml-2 text-xs text-teal-600 font-normal'>
-															(you)
+														<span className='badge-teal text-[10px] px-2 py-0.5'>
+															you
 														</span>
 													)}
-												</p>
-												<span
-													className={`text-xs px-2 py-0.5 rounded-full border ${entryRank.color}`}
-												>
+												</div>
+												<span className={`badge ${entryRank.badge} mt-0.5`}>
 													{entryRank.label}
 												</span>
 											</div>
 
 											{/* Score */}
-											<div className='text-right flex-shrink-0'>
-												<p className='font-bold text-slate-900'>
+											<div className='text-right flex-shrink-0 ml-4'>
+												<p className='text-lg font-bold text-slate-900'>
 													{entry.score}
 												</p>
 												<p className='text-xs text-slate-500'>pts</p>

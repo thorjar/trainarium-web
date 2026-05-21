@@ -40,15 +40,15 @@ export default function EarningsPage() {
 
 	if (loading)
 		return (
-			<div className='p-10 text-center'>
-				<Loader className='animate-spin mx-auto mb-2' />
-				<p className='text-slate-600'>Loading earnings...</p>
+			<div className='text-center py-24'>
+				<Loader className='w-8 h-8 animate-spin mx-auto mb-4 text-teal-600' />
+				<p className='text-slate-500'>Loading earnings...</p>
 			</div>
 		);
 
 	if (error)
 		return (
-			<div className='p-6'>
+			<div className='section-container py-12'>
 				<Card className='border-red-200 bg-red-50'>
 					<CardBody>
 						<p className='text-red-700'>{error}</p>
@@ -62,62 +62,61 @@ export default function EarningsPage() {
 	const pending = contributions.filter(c => c.status === 'PENDING').length;
 
 	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='border-b border-slate-200 bg-white'>
-				<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen'>
+			{/* Header */}
+			<div className='section-header'>
+				<div className='section-container py-8'>
 					<div className='flex items-center gap-3 mb-2'>
-						<DollarSign className='w-8 h-8 text-teal-600' />
-						<h1 className='text-3xl font-bold text-slate-900'>Earnings</h1>
+						<div className='w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20'>
+							<DollarSign className='w-5 h-5 text-white' />
+						</div>
+						<h1 className='page-title'>Earnings</h1>
 					</div>
-					<p className='text-slate-600'>
+					<p className='page-subtitle'>
 						Your labeling and verification earnings
 					</p>
 				</div>
 			</div>
 
-			<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6'>
+			<div className='section-container py-8 space-y-6'>
 				{/* Summary cards */}
-				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
 					{[
 						{
 							label: 'Total Earned',
 							value: `$${(summary?.totalEarned ?? 0).toFixed(2)}`,
 							icon: DollarSign,
-							color: 'bg-teal-50 text-teal-600',
+							gradient: 'from-teal-500 to-teal-600',
 						},
 						{
 							label: 'Approved',
 							value: approved,
 							icon: CheckCircle,
-							color: 'bg-green-50 text-green-600',
+							gradient: 'from-green-500 to-green-600',
 						},
 						{
 							label: 'Pending',
 							value: pending,
 							icon: Clock,
-							color: 'bg-yellow-50 text-yellow-600',
+							gradient: 'from-amber-500 to-amber-600',
 						},
 						{
 							label: 'Rejected',
 							value: rejected,
 							icon: XCircle,
-							color: 'bg-red-50 text-red-600',
+							gradient: 'from-red-500 to-red-600',
 						},
 					].map(stat => {
 						const Icon = stat.icon;
 						return (
-							<Card key={stat.label}>
+							<Card key={stat.label} className='hover-lift'>
 								<CardBody className='flex items-center justify-between'>
 									<div>
-										<p className='text-slate-600 text-sm mb-1'>{stat.label}</p>
-										<p className='text-2xl font-bold text-slate-900'>
-											{stat.value}
-										</p>
+										<p className='stat-label mb-1'>{stat.label}</p>
+										<p className='stat-value'>{stat.value}</p>
 									</div>
-									<div
-										className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}
-									>
-										<Icon className='w-5 h-5' />
+									<div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+										<Icon className='w-6 h-6 text-white' />
 									</div>
 								</CardBody>
 							</Card>
@@ -129,13 +128,10 @@ export default function EarningsPage() {
 				{summary?.byDataset?.length > 0 && (
 					<Card>
 						<CardHeader title='Earnings by Dataset' />
-						<CardBody>
-							<div className='space-y-3'>
+						<CardBody className='p-0'>
+							<div className='divide-y divide-slate-100'>
 								{summary.byDataset.map((d: any) => (
-									<div
-										key={d.datasetId}
-										className='flex items-center justify-between p-3 bg-slate-50 rounded-lg'
-									>
+									<div key={d.datasetId} className='flex items-center justify-between px-6 py-4'>
 										<div>
 											<p className='font-medium text-slate-900'>
 												{d.datasetName}
@@ -144,7 +140,7 @@ export default function EarningsPage() {
 												{d.contributions} contributions
 											</p>
 										</div>
-										<span className='font-bold text-teal-600'>
+										<span className='text-lg font-bold text-teal-600'>
 											${d.totalEarned.toFixed(2)}
 										</span>
 									</div>
@@ -160,57 +156,63 @@ export default function EarningsPage() {
 						title='Contribution History'
 						description='All your labeling and verification contributions'
 					/>
-					<CardBody>
+					<CardBody className='p-0'>
 						{contributions.length === 0 ? (
-							<p className='text-slate-500 text-center py-8'>
-								No contributions yet. Start labeling to earn!
-							</p>
+							<div className='text-center py-12'>
+								<div className='w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+									<DollarSign className='w-7 h-7 text-slate-400' />
+								</div>
+								<p className='text-slate-500'>No contributions yet. Start labeling to earn!</p>
+							</div>
 						) : (
-							<div className='space-y-2'>
+							<div className='divide-y divide-slate-100'>
 								{contributions.map((c: any) => (
-									<div
-										key={c.id}
-										className='flex items-center justify-between p-3 border border-slate-200 rounded-lg'
-									>
-										<div className='flex items-center gap-3'>
-											<span
-												className={`w-2 h-2 rounded-full ${
-													c.status === 'APPROVED'
-														? 'bg-green-500'
-														: c.status === 'REJECTED'
-															? 'bg-red-500'
-															: 'bg-yellow-500'
-												}`}
-											/>
-											<div>
-												<p className='text-sm font-medium text-slate-900'>
+									<div key={c.id} className='flex items-center justify-between px-6 py-4'>
+										<div className='flex items-center gap-4 min-w-0 flex-1'>
+											<div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+												c.status === 'APPROVED'
+													? 'bg-green-500'
+													: c.status === 'REJECTED'
+														? 'bg-red-500'
+														: 'bg-amber-500'
+											}`} />
+											<div className='min-w-0'>
+												<p className='text-sm font-medium text-slate-900 truncate'>
 													{c.type === 'LABEL' ? 'Label' : 'Verification'} —{' '}
 													{c.dataset?.name ?? 'Unknown dataset'}
 												</p>
 												<p className='text-xs text-slate-500'>
-													{new Date(c.createdAt).toLocaleDateString()}
+													{new Date(c.createdAt).toLocaleDateString(undefined, {
+														year: 'numeric',
+														month: 'short',
+														day: 'numeric',
+													})}
 												</p>
 											</div>
 										</div>
-										<div className='text-right'>
-											<p
-												className={`text-sm font-semibold ${
-													c.status === 'APPROVED'
-														? 'text-teal-600'
-														: c.status === 'REJECTED'
-															? 'text-red-500'
-															: 'text-slate-400'
-												}`}
-											>
+										<div className='text-right flex-shrink-0 ml-4'>
+											<p className={`text-sm font-semibold ${
+												c.status === 'APPROVED'
+													? 'text-teal-600'
+													: c.status === 'REJECTED'
+														? 'text-red-500'
+														: 'text-slate-400'
+											}`}>
 												{c.status === 'APPROVED'
 													? `+$${c.earnings.toFixed(3)}`
 													: c.status === 'REJECTED'
 														? 'Rejected'
 														: 'Pending'}
 											</p>
-											<p className='text-xs text-slate-400 capitalize'>
-												{c.status.toLowerCase()}
-											</p>
+											<span className={`badge ${
+												c.status === 'APPROVED'
+													? 'badge-green'
+													: c.status === 'REJECTED'
+														? 'badge-red'
+														: 'badge-yellow'
+											} mt-1`}>
+												{c.status === 'APPROVED' ? 'Approved' : c.status === 'REJECTED' ? 'Rejected' : 'Pending'}
+											</span>
 										</div>
 									</div>
 								))}

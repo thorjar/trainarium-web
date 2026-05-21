@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 * {
 	@apply transition-colors duration-200;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -12,20 +16,26 @@ html {
 
 body {
 	@apply bg-slate-50 text-slate-900;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
+	width: 6px;
+	height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-	@apply bg-slate-100;
+	@apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-slate-400 rounded hover:bg-slate-500;
+	@apply bg-slate-300 rounded-full hover:bg-slate-400;
+}
+
+/* Focus ring */
+:focus-visible {
+	@apply outline-none ring-2 ring-teal-500 ring-offset-2 ring-offset-white;
 }
 
 /* Animations */
@@ -35,18 +45,124 @@ body {
 	}
 
 	.card-shadow {
-		@apply shadow-sm hover:shadow-md;
+		@apply shadow-soft hover:shadow-md-soft;
 	}
 
 	.btn-primary {
-		@apply px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+		@apply px-5 py-2.5 bg-teal-500 text-white rounded-xl font-medium 
+			   hover:bg-teal-600 transition-all duration-200 
+			   disabled:opacity-50 disabled:cursor-not-allowed 
+			   active:scale-[0.98] shadow-soft hover:shadow-md-soft
+			   focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2;
 	}
 
 	.btn-secondary {
-		@apply px-4 py-2 bg-slate-200 text-slate-900 rounded-lg font-medium hover:bg-slate-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+		@apply px-5 py-2.5 bg-white text-slate-700 rounded-xl font-medium 
+			   border border-slate-200 hover:border-slate-300 hover:bg-slate-50 
+			   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+			   active:scale-[0.98] shadow-soft
+			   focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2;
+	}
+
+	.btn-ghost {
+		@apply px-4 py-2 text-slate-600 rounded-xl font-medium 
+			   hover:bg-slate-100 hover:text-slate-900 
+			   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+	}
+
+	.btn-danger {
+		@apply px-5 py-2.5 bg-red-600 text-white rounded-xl font-medium 
+			   hover:bg-red-700 transition-all duration-200 
+			   disabled:opacity-50 disabled:cursor-not-allowed 
+			   active:scale-[0.98] shadow-soft hover:shadow-md-soft;
 	}
 
 	.input-field {
-		@apply w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent;
+		@apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl 
+			   text-slate-900 placeholder:text-slate-400
+			   focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none
+			   transition-all duration-200;
+	}
+
+	.textarea-field {
+		@apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl 
+			   text-slate-900 placeholder:text-slate-400 resize-none
+			   focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none
+			   transition-all duration-200;
+	}
+
+	.select-field {
+		@apply w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl 
+			   text-slate-900
+			   focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none
+			   transition-all duration-200;
+	}
+
+	.badge {
+		@apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border;
+	}
+
+	.badge-teal {
+		@apply badge text-teal-700 bg-teal-50 border-teal-200;
+	}
+
+	.badge-green {
+		@apply badge text-green-700 bg-green-50 border-green-200;
+	}
+
+	.badge-yellow {
+		@apply badge text-yellow-700 bg-yellow-50 border-yellow-200;
+	}
+
+	.badge-red {
+		@apply badge text-red-700 bg-red-50 border-red-200;
+	}
+
+	.badge-slate {
+		@apply badge text-slate-600 bg-slate-50 border-slate-200;
+	}
+
+	.badge-blue {
+		@apply badge text-blue-700 bg-blue-50 border-blue-200;
+	}
+
+	.section-header {
+		@apply border-b border-slate-200 bg-white;
+	}
+
+	.section-container {
+		@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+	}
+
+	.page-title-icon {
+		@apply w-8 h-8 text-teal-600;
+	}
+
+	.page-title {
+		@apply text-3xl font-bold text-slate-900;
+	}
+
+	.page-subtitle {
+		@apply text-slate-600 mt-1;
+	}
+
+	.stat-value {
+		@apply text-3xl font-bold text-slate-900;
+	}
+
+	.stat-label {
+		@apply text-slate-600 text-sm font-medium;
+	}
+
+	.hover-lift {
+		@apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md-soft;
+	}
+
+	.progress-bar {
+		@apply w-full bg-slate-100 rounded-full overflow-hidden;
+	}
+
+	.progress-fill {
+		@apply h-full rounded-full transition-all duration-500 ease-out;
 	}
 }

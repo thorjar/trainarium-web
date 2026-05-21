@@ -17,9 +17,13 @@ export default async function DashboardLayout({
 	return (
 		<>
 			<Header />
-			<div className='flex'>
+			<div className='flex min-h-screen pt-16'>
 				<Sidebar />
-				<main className='flex-1 md:ml-64 pt-16 md:pt-0'>{children}</main>
+				<main className='flex-1 md:ml-64 pb-16 md:pb-0'>
+					<div className='animate-fade-in'>
+						{children}
+					</div>
+				</main>
 			</div>
 		</>
 	);

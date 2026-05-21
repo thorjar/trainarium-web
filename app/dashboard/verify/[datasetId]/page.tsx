@@ -11,8 +11,10 @@ import {
 	ThumbsUp,
 	ThumbsDown,
 	MessageSquare,
+	ChevronLeft,
 } from 'lucide-react';
 import { datasetApi, verificationApi } from '@/lib/api-client';
+import Link from 'next/link';
 
 interface Label {
 	id: string;
@@ -57,7 +59,6 @@ export default function VerifyDatasetPage() {
 		setLoading(true);
 		setError(null);
 		try {
-			// Fetch dataset, items, and my verifications all at once
 			const [ds, itemsRes, myVerificationsRaw] = await Promise.all([
 				datasetApi.get(datasetId, token),
 				datasetApi.getItems(datasetId, page, 10, token, 'LABELED'),
@@ -81,7 +82,6 @@ export default function VerifyDatasetPage() {
 
 			const rawItems: any[] = itemsRes.items ?? [];
 
-			// Fetch labels for each item in parallel
 			const withLabels: QueueItem[] = await Promise.all(
 				rawItems.map(async (item: any) => {
 					const itemId =
@@ -98,7 +98,7 @@ export default function VerifyDatasetPage() {
 
 					return {
 						...item,
-						_id: itemId, // ensure string
+						_id: itemId,
 						labels: Array.isArray(labels) ? labels : [],
 						submitting: false,
 						decision: myVerification
@@ -112,7 +112,6 @@ export default function VerifyDatasetPage() {
 				}),
 			);
 
-			// Show items that have labels — temporarily show all for testing
 			const queue = withLabels.filter(item => item.labels.length > 0);
 			setItems(queue);
 		} catch (err: any) {
@@ -137,7 +136,7 @@ export default function VerifyDatasetPage() {
 				approved,
 				token,
 				item.comment || undefined,
-				datasetId, // ← add this
+				datasetId,
 			);
 			updateItem(item._id, {
 				decision: approved ? 'approved' : 'rejected',
@@ -153,9 +152,9 @@ export default function VerifyDatasetPage() {
 
 	if (loading)
 		return (
-			<div className='p-10 text-center'>
-				<Loader className='animate-spin mx-auto mb-2 text-green-600' />
-				<p className='text-slate-600'>Loading verification queue...</p>
+			<div className='text-center py-24'>
+				<Loader className='w-8 h-8 animate-spin mx-auto mb-4 text-green-600' />
+				<p className='text-slate-500'>Loading verification queue...</p>
 			</div>
 		);
 
@@ -174,23 +173,25 @@ export default function VerifyDatasetPage() {
 	const doneItems = items.filter(i => i.decision !== null);
 
 	return (
-		<div className='p-6 space-y-4 max-w-4xl mx-auto'>
+		<div className='p-4 sm:p-6 space-y-5 max-w-4xl mx-auto animate-fade-in'>
 			{/* Header */}
-			<div className='flex items-center justify-between'>
+			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
 				<div>
-					<div className='flex items-center gap-2'>
-						<CheckCircle className='w-6 h-6 text-green-600' />
-						<h1 className='text-2xl font-bold text-slate-900'>
-							{dataset?.name ?? 'Verify Dataset'}
-						</h1>
+					<div className='flex items-center gap-3'>
+						<Link href='/dashboard/verify' className='p-2 rounded-xl hover:bg-slate-100 transition-colors'>
+							<ChevronLeft className='w-5 h-5 text-slate-400' />
+						</Link>
+						<div>
+							<h1 className='text-2xl font-bold text-slate-900'>
+								{dataset?.name ?? 'Verify Dataset'}
+							</h1>
+							{dataset?.description && (
+								<p className='text-sm text-slate-500 mt-0.5'>{dataset.description}</p>
+							)}
+						</div>
 					</div>
-					{dataset?.description && (
-						<p className='text-sm text-slate-500 mt-1 ml-8'>
-							{dataset.description}
-						</p>
-					)}
 				</div>
-				<div className='text-right'>
+				<div className='text-right ml-12 sm:ml-0'>
 					<p className='text-2xl font-bold text-green-600'>{verifiedCount}</p>
 					<p className='text-xs text-slate-500'>verified this session</p>
 				</div>
@@ -198,14 +199,14 @@ export default function VerifyDatasetPage() {
 
 			{/* Progress */}
 			{items.length > 0 && (
-				<div className='bg-white border border-slate-200 rounded-lg p-4'>
-					<div className='flex justify-between text-sm text-slate-600 mb-2'>
-						<span>{pendingItems.length} pending on this page</span>
-						<span>{doneItems.length} reviewed</span>
+				<div className='bg-white rounded-2xl border border-slate-200 p-5 shadow-soft'>
+					<div className='flex justify-between text-sm text-slate-600 mb-2.5'>
+						<span>{pendingItems.length} pending</span>
+						<span className='font-medium text-green-600'>{doneItems.length} reviewed</span>
 					</div>
-					<div className='w-full bg-slate-200 rounded-full h-2'>
+					<div className='progress-bar h-2.5'>
 						<div
-							className='bg-green-500 h-2 rounded-full transition-all'
+							className='progress-fill bg-gradient-to-r from-green-400 to-green-500'
 							style={{
 								width: `${Math.round((doneItems.length / Math.max(items.length, 1)) * 100)}%`,
 							}}
@@ -216,173 +217,170 @@ export default function VerifyDatasetPage() {
 
 			{items.length === 0 ? (
 				<Card>
-					<CardBody className='text-center py-12'>
-						<CheckCircle className='w-12 h-12 text-green-300 mx-auto mb-4' />
-						<h3 className='text-lg font-semibold text-slate-900 mb-2'>
+					<CardBody className='text-center py-16'>
+						<div className='w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-5'>
+							<CheckCircle className='w-8 h-8 text-green-400' />
+						</div>
+						<h3 className='text-xl font-semibold text-slate-900 mb-2'>
 							All caught up!
 						</h3>
-						<p className='text-slate-600'>
+						<p className='text-slate-500'>
 							No labeled items to verify on this page.
 						</p>
 					</CardBody>
 				</Card>
 			) : (
 				<div className='space-y-4'>
-					{items.map(item => (
-						<Card
-							key={item._id}
-							className={
-								item.decision === 'approved'
-									? 'border-green-300 bg-green-50/30'
-									: item.decision === 'rejected'
-										? 'border-red-300 bg-red-50/30'
-										: ''
-							}
-						>
-							<CardBody>
-								{/* Decision banner */}
-								{item.decision !== null && (
-									<div
-										className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-sm font-medium ${
-											item.decision === 'approved'
-												? 'bg-green-100 text-green-700'
-												: 'bg-red-100 text-red-700'
-										}`}
-									>
-										{item.decision === 'approved' ? (
-											<>
-												<ThumbsUp className='w-4 h-4' /> You approved this label
-											</>
-										) : (
-											<>
-												<ThumbsDown className='w-4 h-4' /> You rejected this
-												label
-											</>
+					{items.map((item, index) => {
+						const itemNumber = ((page - 1) * 10) + index + 1;
+						return (
+							<Card
+								key={item._id}
+								className={
+									item.decision === 'approved'
+										? 'border-green-200 bg-green-50/20'
+										: item.decision === 'rejected'
+											? 'border-red-200 bg-red-50/20'
+											: ''
+								}
+							>
+								<CardBody>
+									{/* Item number */}
+									<div className='flex items-center gap-2 mb-3'>
+										<span className='text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg'>
+											#{itemNumber}
+										</span>
+										{item.decision === null && (
+											<span className='badge-yellow'>Pending review</span>
 										)}
 									</div>
-								)}
 
-								{/* Item content */}
-								<div className='bg-slate-50 rounded-lg p-3 mb-4'>
-									{typeof item.content === 'object' && item.content !== null ? (
-										<div className='space-y-1'>
-											{Object.entries(item.content).map(([key, value]) => (
-												<div key={key} className='flex gap-2 text-sm'>
-													<span className='font-medium text-slate-700 min-w-32 shrink-0'>
-														{key}:
+									{/* Decision banner */}
+									{item.decision !== null && (
+										<div
+											className={`flex items-center gap-2 mb-4 px-4 py-2.5 rounded-xl text-sm font-medium ${
+												item.decision === 'approved'
+													? 'bg-green-100 text-green-700'
+													: 'bg-red-100 text-red-700'
+											}`}
+										>
+											{item.decision === 'approved' ? (
+												<><ThumbsUp className='w-4 h-4' /> You approved this label</>
+											) : (
+												<><ThumbsDown className='w-4 h-4' /> You rejected this label</>
+											)}
+										</div>
+									)}
+
+									{/* Item content */}
+									<div className='bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100'>
+										{typeof item.content === 'object' && item.content !== null ? (
+											<div className='space-y-1.5'>
+												{Object.entries(item.content).map(([key, value]) => (
+													<div key={key} className='flex gap-2 text-sm'>
+														<span className='font-medium text-slate-600 min-w-28 shrink-0'>{key}:</span>
+														<span className='text-slate-700'>{String(value)}</span>
+													</div>
+												))}
+											</div>
+										) : (
+											<p className='text-sm text-slate-700 whitespace-pre-wrap'>
+												{String(item.content)}
+											</p>
+										)}
+									</div>
+
+									{/* Labels */}
+									<div className='mb-4'>
+										<p className='text-xs font-medium text-slate-500 mb-2.5'>
+											Submitted labels ({item.labels.length})
+										</p>
+										<div className='flex flex-wrap gap-2'>
+											{item.labels.map(label => (
+												<div
+													key={label.id}
+													className='flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3.5 py-2 shadow-soft'
+												>
+													{label.user?.image ? (
+														<img src={label.user.image} alt='' className='w-5 h-5 rounded-full' />
+													) : (
+														<div className='w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center text-xs text-teal-700 font-medium'>
+															{label.user?.name?.[0] ?? '?'}
+														</div>
+													)}
+													<span className='text-sm font-semibold text-slate-800'>
+														{label.value}
 													</span>
-													<span className='text-slate-600'>
-														{String(value)}
+													<span className='text-xs text-slate-400'>
+														— {label.user?.name ?? 'Unknown'}
 													</span>
 												</div>
 											))}
 										</div>
-									) : (
-										<pre className='text-sm whitespace-pre-wrap text-slate-700'>
-											{String(item.content)}
-										</pre>
-									)}
-								</div>
+									</div>
 
-								{/* Labels */}
-								<div className='mb-4'>
-									<p className='text-xs font-medium text-slate-500 mb-2'>
-										Submitted labels ({item.labels.length})
-									</p>
-									<div className='flex flex-wrap gap-2'>
-										{item.labels.map(label => (
-											<div
-												key={label.id}
-												className='flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2'
+									{/* Optional comment */}
+									{item.decision === null && (
+										<div className='mb-4'>
+											<button
+												onClick={() => updateItem(item._id, { showComment: !item.showComment })}
+												className='flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors'
 											>
-												{label.user?.image ? (
-													<img
-														src={label.user.image}
-														alt=''
-														className='w-5 h-5 rounded-full'
-													/>
+												<MessageSquare className='w-3.5 h-3.5' />
+												{item.showComment ? 'Hide comment' : 'Add comment (optional)'}
+											</button>
+											{item.showComment && (
+												<input
+													type='text'
+													value={item.comment}
+													onChange={e => updateItem(item._id, { comment: e.target.value })}
+													placeholder='Explain your decision...'
+													className='input-field text-sm mt-2'
+													autoFocus
+												/>
+											)}
+										</div>
+									)}
+
+									{/* Approve / Reject buttons */}
+									{item.decision === null && (
+										<div className='flex gap-3'>
+											<button
+												onClick={() => submitVerification(item, true)}
+												disabled={item.submitting}
+												className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 active:scale-[0.98] text-white rounded-xl font-medium transition-all duration-200 shadow-soft disabled:opacity-50'
+											>
+												{item.submitting ? (
+													<Loader className='w-4 h-4 animate-spin' />
 												) : (
-													<div className='w-5 h-5 rounded-full bg-teal-100 flex items-center justify-center text-xs text-teal-700 font-medium'>
-														{label.user?.name?.[0] ?? '?'}
-													</div>
+													<ThumbsUp className='w-4 h-4' />
 												)}
-												<span className='text-sm font-semibold text-slate-800'>
-													{label.value}
-												</span>
-												<span className='text-xs text-slate-400'>
-													— {label.user?.name ?? 'Unknown'}
-												</span>
-											</div>
-										))}
-									</div>
-								</div>
-
-								{/* Optional comment */}
-								{item.decision === null && (
-									<div className='mb-3'>
-										<button
-											onClick={() =>
-												updateItem(item._id, { showComment: !item.showComment })
-											}
-											className='flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors'
-										>
-											<MessageSquare className='w-3 h-3' />
-											{item.showComment
-												? 'Hide comment'
-												: 'Add comment (optional)'}
-										</button>
-										{item.showComment && (
-											<input
-												type='text'
-												value={item.comment}
-												onChange={e =>
-													updateItem(item._id, { comment: e.target.value })
-												}
-												placeholder='Explain your decision...'
-												className='input-field text-sm mt-2'
-											/>
-										)}
-									</div>
-								)}
-
-								{/* Approve / Reject buttons */}
-								{item.decision === null && (
-									<div className='flex gap-3'>
-										<button
-											onClick={() => submitVerification(item, true)}
-											disabled={item.submitting}
-											className='flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50'
-										>
-											{item.submitting ? (
-												<Loader className='w-4 h-4 animate-spin' />
-											) : (
-												<ThumbsUp className='w-4 h-4' />
-											)}
-											Approve
-										</button>
-										<button
-											onClick={() => submitVerification(item, false)}
-											disabled={item.submitting}
-											className='flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50'
-										>
-											{item.submitting ? (
-												<Loader className='w-4 h-4 animate-spin' />
-											) : (
-												<XCircle className='w-4 h-4' />
-											)}
-											Reject
-										</button>
-									</div>
-								)}
-							</CardBody>
-						</Card>
-					))}
+												Approve
+											</button>
+											<button
+												onClick={() => submitVerification(item, false)}
+												disabled={item.submitting}
+												className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white rounded-xl font-medium transition-all duration-200 shadow-soft disabled:opacity-50'
+											>
+												{item.submitting ? (
+													<Loader className='w-4 h-4 animate-spin' />
+												) : (
+													<XCircle className='w-4 h-4' />
+												)}
+												Reject
+											</button>
+										</div>
+									)}
+								</CardBody>
+							</Card>
+						);
+					})}
 				</div>
 			)}
 
 			{/* Pagination */}
 			{pagination && pagination.pages > 1 && (
-				<div className='flex items-center justify-center gap-2 pt-4'>
+				<div className='flex items-center justify-center gap-3 pt-4'>
 					<button
 						onClick={() => setPage(p => Math.max(1, p - 1))}
 						disabled={page === 1}
@@ -390,9 +388,24 @@ export default function VerifyDatasetPage() {
 					>
 						Previous
 					</button>
-					<span className='text-sm text-slate-600'>
-						Page {page} of {pagination.pages}
-					</span>
+					<div className='flex items-center gap-1.5'>
+						{Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => {
+							const pageNum = i + 1;
+							return (
+								<button
+									key={pageNum}
+									onClick={() => setPage(pageNum)}
+									className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
+										page === pageNum
+											? 'bg-green-500 text-white'
+											: 'text-slate-600 hover:bg-slate-100'
+									}`}
+								>
+									{pageNum}
+								</button>
+							);
+						})}
+					</div>
 					<button
 						onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
 						disabled={page === pagination.pages}

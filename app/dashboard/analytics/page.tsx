@@ -31,6 +31,12 @@ const VisibilityIcon = ({ v }: { v: Dataset['visibility'] }) => {
 	return <Lock className='w-3 h-3' />;
 };
 
+const visibilityStyles: Record<Dataset['visibility'], string> = {
+	PUBLIC: 'badge-teal',
+	TEAM: 'badge-blue',
+	PRIVATE: 'badge-slate',
+};
+
 export default function AnalyticsIndexPage() {
 	const { data: session } = useSession();
 	const [datasets, setDatasets] = useState<Dataset[]>([]);
@@ -49,25 +55,27 @@ export default function AnalyticsIndexPage() {
 	}, [token]);
 
 	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='border-b border-slate-200 bg-white'>
-				<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen'>
+			{/* Header */}
+			<div className='section-header'>
+				<div className='section-container py-8'>
 					<div className='flex items-center gap-3 mb-2'>
-						<BarChart3 className='w-8 h-8 text-teal-600' />
-						<h1 className='text-3xl font-bold text-slate-900'>Analytics</h1>
+						<div className='w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20'>
+							<BarChart3 className='w-5 h-5 text-white' />
+						</div>
+						<h1 className='page-title'>Analytics</h1>
 					</div>
-					<p className='text-slate-600'>
-						View quality metrics, label distribution and export data for your
-						datasets
+					<p className='page-subtitle'>
+						View quality metrics, label distribution and export data for your datasets
 					</p>
 				</div>
 			</div>
 
-			<div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+			<div className='section-container py-8'>
 				{loading && (
-					<div className='text-center py-12'>
+					<div className='text-center py-16'>
 						<Loader className='w-8 h-8 animate-spin mx-auto text-teal-600 mb-4' />
-						<p className='text-slate-600'>Loading datasets...</p>
+						<p className='text-slate-500'>Loading datasets...</p>
 					</div>
 				)}
 
@@ -81,18 +89,21 @@ export default function AnalyticsIndexPage() {
 
 				{!loading && !error && datasets.length === 0 && (
 					<Card>
-						<CardBody className='text-center py-12'>
-							<BarChart3 className='w-12 h-12 text-slate-300 mx-auto mb-4' />
-							<h3 className='text-lg font-semibold text-slate-900 mb-2'>
+						<CardBody className='text-center py-16'>
+							<div className='w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-5'>
+								<BarChart3 className='w-8 h-8 text-slate-400' />
+							</div>
+							<h3 className='text-xl font-semibold text-slate-900 mb-2'>
 								No datasets yet
 							</h3>
-							<p className='text-slate-600 mb-6'>
+							<p className='text-slate-500 mb-8'>
 								Upload a dataset to start tracking analytics
 							</p>
 							<Link
 								href='/dashboard/upload'
-								className='btn-primary inline-block'
+								className='btn-primary inline-flex items-center gap-2'
 							>
+								<BarChart3 className='w-4 h-4' />
 								Upload Dataset
 							</Link>
 						</CardBody>
@@ -105,8 +116,8 @@ export default function AnalyticsIndexPage() {
 							title='Your Datasets'
 							description='Select a dataset to view detailed analytics and export data'
 						/>
-						<CardBody>
-							<div className='space-y-2'>
+						<CardBody className='p-0'>
+							<div className='divide-y divide-slate-100'>
 								{datasets.map(dataset => {
 									const labelPct = Math.round(
 										(dataset.labeledItems / Math.max(dataset.totalItems, 1)) *
@@ -121,69 +132,54 @@ export default function AnalyticsIndexPage() {
 										<Link
 											key={dataset.id}
 											href={`/dashboard/analytics/${dataset.id}`}
+											className='block px-6 py-5 hover:bg-slate-50 transition-colors group'
 										>
-											<div className='border border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-teal-500 transition-all group cursor-pointer'>
-												<div className='flex items-center justify-between mb-3'>
-													<div className='flex-1'>
-														<div className='flex items-center gap-2 mb-0.5'>
-															<h3 className='font-semibold text-slate-900 group-hover:text-teal-600 transition-colors'>
-																{dataset.name}
-															</h3>
-															<span
-																className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border ${
-																	dataset.visibility === 'PUBLIC'
-																		? 'text-teal-600 bg-teal-50 border-teal-200'
-																		: dataset.visibility === 'TEAM'
-																			? 'text-blue-600 bg-blue-50 border-blue-200'
-																			: 'text-slate-500 bg-slate-50 border-slate-200'
-																}`}
-															>
-																<VisibilityIcon v={dataset.visibility} />
-																{dataset.visibility}
-															</span>
-														</div>
-														{dataset.description && (
-															<p className='text-sm text-slate-500'>
-																{dataset.description}
-															</p>
-														)}
+											<div className='flex items-center justify-between gap-4 mb-3'>
+												<div className='min-w-0 flex-1'>
+													<div className='flex items-center gap-2.5 mb-0.5'>
+														<h3 className='font-semibold text-slate-900 group-hover:text-teal-600 transition-colors'>
+															{dataset.name}
+														</h3>
+														<span className={visibilityStyles[dataset.visibility]}>
+															<VisibilityIcon v={dataset.visibility} />
+															{dataset.visibility}
+														</span>
 													</div>
-													<ChevronRight className='w-5 h-5 text-slate-400 group-hover:text-teal-600 transition-colors flex-shrink-0' />
+													{dataset.description && (
+														<p className='text-sm text-slate-500'>
+															{dataset.description}
+														</p>
+													)}
 												</div>
+												<ChevronRight className='w-5 h-5 text-slate-300 group-hover:text-teal-500 transition-colors flex-shrink-0' />
+											</div>
 
-												<div className='grid grid-cols-3 gap-4 text-sm'>
-													<div>
-														<p className='text-slate-500 text-xs mb-1'>
-															Total Items
-														</p>
-														<p className='font-semibold text-slate-900'>
-															{dataset.totalItems}
-														</p>
-													</div>
-													<div>
-														<p className='text-slate-500 text-xs mb-1'>
-															Labeled
-														</p>
-														<p className='font-semibold text-teal-600'>
-															{labelPct}%
-														</p>
-													</div>
-													<div>
-														<p className='text-slate-500 text-xs mb-1'>
-															Verified
-														</p>
-														<p className='font-semibold text-green-600'>
-															{verifyPct}%
-														</p>
-													</div>
+											<div className='grid grid-cols-3 gap-6 text-sm mb-3'>
+												<div>
+													<p className='text-xs text-slate-500 mb-0.5'>Total Items</p>
+													<p className='font-semibold text-slate-900'>
+														{dataset.totalItems}
+													</p>
 												</div>
+												<div>
+													<p className='text-xs text-slate-500 mb-0.5'>Labeled</p>
+													<p className='font-semibold text-teal-600'>
+														{labelPct}%
+													</p>
+												</div>
+												<div>
+													<p className='text-xs text-slate-500 mb-0.5'>Verified</p>
+													<p className='font-semibold text-green-600'>
+														{verifyPct}%
+													</p>
+												</div>
+											</div>
 
-												<div className='w-full bg-slate-200 rounded-full h-1.5 mt-3'>
-													<div
-														className='bg-green-500 h-1.5 rounded-full transition-all'
-														style={{ width: `${verifyPct}%` }}
-													/>
-												</div>
+											<div className='progress-bar h-2'>
+												<div
+													className='progress-fill bg-gradient-to-r from-teal-400 to-green-500'
+													style={{ width: `${verifyPct}%` }}
+												/>
 											</div>
 										</Link>
 									);

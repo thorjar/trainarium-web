@@ -36,24 +36,27 @@ export default function VerifyLabelsPage() {
 	}, [session]);
 
 	return (
-		<div className='min-h-screen bg-slate-50'>
-			<div className='border-b border-slate-200 bg-white'>
-				<div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+		<div className='min-h-screen'>
+			{/* Header */}
+			<div className='section-header'>
+				<div className='section-container py-8'>
 					<div className='flex items-center gap-3 mb-2'>
-						<CheckCircle className='w-8 h-8 text-green-600' />
-						<h1 className='text-3xl font-bold text-slate-900'>Verify Labels</h1>
+						<div className='w-10 h-10 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/20'>
+							<CheckCircle className='w-5 h-5 text-white' />
+						</div>
+						<h1 className='page-title'>Verify Labels</h1>
 					</div>
-					<p className='text-slate-600'>
+					<p className='page-subtitle'>
 						Review and verify labeled data to ensure quality
 					</p>
 				</div>
 			</div>
 
-			<div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+			<div className='section-container py-8'>
 				{loading && (
-					<div className='text-center py-12'>
+					<div className='text-center py-16'>
 						<Loader className='w-8 h-8 animate-spin mx-auto text-green-600 mb-4' />
-						<p className='text-slate-600'>Loading datasets...</p>
+						<p className='text-slate-500'>Loading datasets...</p>
 					</div>
 				)}
 				{error && (
@@ -65,12 +68,14 @@ export default function VerifyLabelsPage() {
 				)}
 				{!loading && !error && datasets.length === 0 && (
 					<Card>
-						<CardBody className='text-center py-12'>
-							<CheckCircle className='w-12 h-12 text-slate-300 mx-auto mb-4' />
-							<h3 className='text-lg font-semibold text-slate-900 mb-2'>
+						<CardBody className='text-center py-16'>
+							<div className='w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-5'>
+								<CheckCircle className='w-8 h-8 text-slate-400' />
+							</div>
+							<h3 className='text-xl font-semibold text-slate-900 mb-2'>
 								No datasets to verify
 							</h3>
-							<p className='text-slate-600'>
+							<p className='text-slate-500'>
 								Wait for team members to label data first
 							</p>
 						</CardBody>
@@ -82,8 +87,8 @@ export default function VerifyLabelsPage() {
 							title='Verification Queue'
 							description='Review labeled data from your team'
 						/>
-						<CardBody>
-							<div className='space-y-2'>
+						<CardBody className='p-0'>
+							<div className='divide-y divide-slate-100'>
 								{datasets.map(dataset => {
 									const remainingToVerify =
 										dataset.labeledItems - dataset.verifiedItems;
@@ -96,35 +101,34 @@ export default function VerifyLabelsPage() {
 										<Link
 											key={dataset.id}
 											href={`/dashboard/verify/${dataset.id}`}
+											className='block px-6 py-5 hover:bg-slate-50 transition-colors group'
 										>
-											<div className='border border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-green-500 transition-all group cursor-pointer'>
-												<div className='flex items-center justify-between mb-3'>
-													<div className='flex-1'>
-														<h3 className='font-semibold text-slate-900 group-hover:text-green-600 transition-colors'>
-															{dataset.name}
-														</h3>
-														{dataset.description && (
-															<p className='text-sm text-slate-600 mt-1'>
-																{dataset.description}
-															</p>
-														)}
-													</div>
-													<ChevronRight className='w-5 h-5 text-slate-400 group-hover:text-green-600 transition-colors' />
+											<div className='flex items-center justify-between gap-4 mb-2'>
+												<div className='min-w-0 flex-1'>
+													<h3 className='font-semibold text-slate-900 group-hover:text-green-600 transition-colors'>
+														{dataset.name}
+													</h3>
+													{dataset.description && (
+														<p className='text-sm text-slate-500 mt-0.5 truncate'>
+															{dataset.description}
+														</p>
+													)}
 												</div>
-												<div className='flex items-center justify-between text-sm mb-2'>
-													<span className='text-slate-600'>
-														{remainingToVerify} pending review
-													</span>
-													<span className='font-medium text-green-600'>
-														{verifyPercent}% verified
-													</span>
-												</div>
-												<div className='w-full bg-slate-200 rounded-full h-2'>
-													<div
-														className='bg-green-500 h-2 rounded-full transition-all'
-														style={{ width: `${verifyPercent}%` }}
-													/>
-												</div>
+												<ChevronRight className='w-5 h-5 text-slate-300 group-hover:text-green-500 transition-colors flex-shrink-0' />
+											</div>
+											<div className='flex items-center justify-between text-sm mb-2'>
+												<span className='text-slate-500'>
+													{remainingToVerify} pending review
+												</span>
+												<span className='font-medium text-green-600'>
+													{verifyPercent}% verified
+												</span>
+											</div>
+											<div className='progress-bar h-2'>
+												<div
+													className='progress-fill bg-gradient-to-r from-green-400 to-green-500'
+													style={{ width: `${verifyPercent}%` }}
+												/>
 											</div>
 										</Link>
 									);
