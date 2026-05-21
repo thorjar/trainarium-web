@@ -24,7 +24,7 @@ export default function DatasetAnalyticsPage() {
 	const [error, setError] = useState('');
 	const [exporting, setExporting] = useState(false);
 
-	const token = (session as any)?.token as string;
+	const token = (session as any)?.apiToken as string;
 	const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 	useEffect(() => {

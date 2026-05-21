@@ -6,7 +6,6 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import {
 	DollarSign,
 	Loader,
-	TrendingUp,
 	CheckCircle,
 	XCircle,
 	Clock,

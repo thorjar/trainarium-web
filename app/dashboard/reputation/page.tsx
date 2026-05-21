@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
-import { Star, Loader, Trophy, TrendingUp } from 'lucide-react';
+import { Star, Loader, Trophy } from 'lucide-react';
 
 const RANKS = [
 	{

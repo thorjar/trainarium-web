@@ -66,19 +66,19 @@ async function fetchApi<T>(
 }
 
 export const authApi = {
-	register: (name: string, email: string, password: string) =>
+	register: (name: string, email: string, password: string): Promise<any> =>
 		fetchApi('/api/auth/register', {
 			method: 'POST',
 			body: JSON.stringify({ name, email, password }),
 		}),
 
-	login: (email: string, password: string) =>
+	login: (email: string, password: string): Promise<any> =>
 		fetchApi('/api/auth/login', {
 			method: 'POST',
 			body: JSON.stringify({ email, password }),
 		}),
 
-	syncUser: (email: string, name?: string, image?: string) =>
+	syncUser: (email: string, name?: string, image?: string): Promise<any> =>
 		fetchApi('/api/auth/sync-user', {
 			method: 'POST',
 			body: JSON.stringify({ email, name, image }),
@@ -86,9 +86,10 @@ export const authApi = {
 };
 
 export const datasetApi = {
-	list: (token: string) => fetchApi<any[]>('/api/datasets', { token }),
+	list: (token: string): Promise<any[]> =>
+		fetchApi<any[]>('/api/datasets', { token }),
 
-	get: (id: string, token: string) =>
+	get: (id: string, token: string): Promise<any> =>
 		fetchApi<any>(`/api/datasets/${id}`, { token }),
 
 	create: (
@@ -99,8 +100,9 @@ export const datasetApi = {
 		visibility?: string,
 		rewardPerItem?: number,
 		consensusRequired?: number,
-	) =>
-		fetchApi('/api/datasets', {
+	): Promise<{ id: string; [key: string]: any }> =>
+		// Fixed: Explicitly typed return shape
+		fetchApi<{ id: string; [key: string]: any }>('/api/datasets', {
 			method: 'POST',
 			token,
 			body: JSON.stringify({
@@ -119,13 +121,13 @@ export const datasetApi = {
 		limit = 20,
 		token: string,
 		status?: string,
-	) =>
+	): Promise<{ items: any[]; pagination: any }> =>
 		fetchApi<{ items: any[]; pagination: any }>(
 			`/api/datasets/${id}/items?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}`,
 			{ token },
 		),
 
-	uploadItems: (datasetId: string, items: any[], token: string) =>
+	uploadItems: (datasetId: string, items: any[], token: string): Promise<any> =>
 		fetchApi(`/api/datasets/${datasetId}/items`, {
 			method: 'POST',
 			token,
@@ -167,20 +169,29 @@ export const verificationApi = {
 		token: string,
 		comments?: string,
 		datasetId?: string,
-	) =>
+	): Promise<any> =>
 		fetchApi('/api/verifications', {
 			method: 'POST',
 			token,
 			body: JSON.stringify({ itemId, datasetId, approved, comments }),
 		}),
 
-	getQueue: (token: string) => fetchApi('/api/verifications/queue', { token }),
+	getQueue: (token: string): Promise<any> =>
+		fetchApi('/api/verifications/queue', { token }),
 
-	getMy: (token: string) => fetchApi('/api/verifications/my', { token }),
+	getMy: (token: string): Promise<any> =>
+		fetchApi('/api/verifications/my', { token }),
 };
 
 export const statsApi = {
-	get: (token: string) =>
+	get: (
+		token: string,
+	): Promise<{
+		totalDatasets: number;
+		totalItems: number;
+		totalLabels: number;
+		totalVerifications: number;
+	}> =>
 		fetchApi<{
 			totalDatasets: number;
 			totalItems: number;
@@ -190,10 +201,13 @@ export const statsApi = {
 };
 
 export const usersApi = {
-	getMe: (token: string) =>
+	getMe: (token: string): Promise<{ user: any; stats: any }> =>
 		fetchApi<{ user: any; stats: any }>('/api/users/me', { token }),
 
-	updateMe: (data: { name?: string; image?: string }, token: string) =>
+	updateMe: (
+		data: { name?: string; image?: string },
+		token: string,
+	): Promise<any> =>
 		fetchApi('/api/users/me', {
 			method: 'PATCH',
 			token,

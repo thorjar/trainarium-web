@@ -36,12 +36,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 					const data = await response.json();
 
+					// This maps cleanly to the extended User interface defined in next-auth.d.ts
 					return {
 						id: data.user.id,
 						email: data.user.email,
 						name: data.user.name,
 						image: data.user.image,
-						apiToken: data.token, // store as apiToken to avoid conflicts
+						apiToken: data.token,
 					};
 				} catch (error) {
 					throw new Error('Failed to authenticate');
@@ -58,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			// On initial credentials sign-in
 			if (user) {
 				token.id = user.id;
-				token.token = (user as any).apiToken;
+				token.apiToken = user.apiToken; // Clean assignment, no "as any" bypass needed
 			}
 
 			// On OAuth sign-in — sync with backend
@@ -77,7 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					if (response.ok) {
 						const data = await response.json();
 						token.id = data.user.id;
-						token.token = data.token; // your sync-user route needs to return token too
+						token.apiToken = data.token;
 					}
 				} catch (error) {
 					console.error('Failed to sync user with backend:', error);
@@ -91,7 +92,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			if (session.user) {
 				session.user.id = token.id as string;
 			}
-			(session as any).token = token.token as string;
+			// TypeScript safely reads this from the augmented module definitions now
+			session.apiToken = token.apiToken;
 			return session;
 		},
 	},

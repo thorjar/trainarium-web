@@ -37,7 +37,7 @@ export default function AnalyticsIndexPage() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 
-	const token = (session as any)?.token as string;
+	const token = (session as any)?.apiToken as string;
 
 	useEffect(() => {
 		if (!token) return;

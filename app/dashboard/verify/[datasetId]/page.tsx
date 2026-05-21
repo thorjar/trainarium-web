@@ -46,7 +46,6 @@ export default function VerifyDatasetPage() {
 	const [verifiedCount, setVerifiedCount] = useState(0);
 
 	const token = (session as any)?.apiToken as string;
-	const userId = session?.user?.id;
 	const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 	useEffect(() => {

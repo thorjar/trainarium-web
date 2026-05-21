@@ -7,7 +7,7 @@ import { Settings, User, Lock, Bell, LogOut, Loader } from 'lucide-react';
 import { usersApi } from '@/lib/api-client';
 
 export default function SettingsPage() {
-	const { data: session, update, status } = useSession();
+	const { data: session, update } = useSession();
 	const [activeTab, setActiveTab] = useState<
 		'profile' | 'security' | 'notifications'
 	>('profile');
