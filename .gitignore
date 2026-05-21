@@ -1,4 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+trainarium-logo/
 
 # dependencies
 /node_modules
@@ -27,6 +28,8 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.local
+.env.example
 
 # vercel
 .vercel
@@ -34,3 +37,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# markdown
+*.md
