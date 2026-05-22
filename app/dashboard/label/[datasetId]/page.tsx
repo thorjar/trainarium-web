@@ -7,6 +7,8 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Loader, Tag, Trash2, CheckCircle, Circle, ChevronLeft } from 'lucide-react';
 import { datasetApi, labelApi } from '@/lib/api-client';
 import Link from 'next/link';
+import { Zap } from 'lucide-react';
+
 
 interface DataItem {
 	_id: string;
@@ -148,7 +150,10 @@ export default function LabelDatasetPage() {
 			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3'>
 				<div>
 					<div className='flex items-center gap-3'>
-						<Link href='/dashboard/label' className='p-2 rounded-xl hover:bg-slate-100 transition-colors'>
+						<Link
+							href='/dashboard/label'
+							className='p-2 rounded-xl hover:bg-slate-100 transition-colors'
+						>
 							<ChevronLeft className='w-5 h-5 text-slate-400' />
 						</Link>
 						<div>
@@ -156,7 +161,9 @@ export default function LabelDatasetPage() {
 								{dataset?.name ?? 'Label Dataset'}
 							</h1>
 							{dataset?.description && (
-								<p className='text-sm text-slate-500 mt-0.5'>{dataset.description}</p>
+								<p className='text-sm text-slate-500 mt-0.5'>
+									{dataset.description}
+								</p>
 							)}
 						</div>
 					</div>
@@ -171,7 +178,9 @@ export default function LabelDatasetPage() {
 			{/* Label class legend */}
 			{labelClasses.length > 0 && (
 				<div className='bg-teal-50 border border-teal-200 rounded-2xl px-5 py-4'>
-					<p className='text-sm font-medium text-teal-800 mb-2.5'>Label classes:</p>
+					<p className='text-sm font-medium text-teal-800 mb-2.5'>
+						Label classes:
+					</p>
 					<div className='flex flex-wrap gap-2'>
 						{labelClasses.map(cls => (
 							<span key={cls} className='badge-teal'>
@@ -181,6 +190,14 @@ export default function LabelDatasetPage() {
 					</div>
 				</div>
 			)}
+
+			<Link
+				href={`/dashboard/label/${datasetId}/swipe`}
+				className='flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors'
+			>
+				<Zap className='w-4 h-4' />
+				Swipe Mode
+			</Link>
 
 			{items.length === 0 ? (
 				<Card>
@@ -195,12 +212,13 @@ export default function LabelDatasetPage() {
 				<>
 					<div className='space-y-4'>
 						{items.map((item, index) => {
-							const itemNumber = ((page - 1) * 10) + index + 1;
-							const borderClass = item.status === 'VERIFIED'
-								? 'border-green-200'
-								: item.status === 'LABELED'
-									? 'border-teal-200'
-									: '';
+							const itemNumber = (page - 1) * 10 + index + 1;
+							const borderClass =
+								item.status === 'VERIFIED'
+									? 'border-green-200'
+									: item.status === 'LABELED'
+										? 'border-teal-200'
+										: '';
 							return (
 								<Card key={item._id ?? index} className={borderClass}>
 									<CardBody>
@@ -214,25 +232,32 @@ export default function LabelDatasetPage() {
 											) : (
 												<Circle className='w-4 h-4 text-slate-300' />
 											)}
-											<span className={`badge ${
-												item.status === 'VERIFIED'
-													? 'badge-green'
-													: item.status === 'LABELED'
-														? 'badge-teal'
-														: 'badge-slate'
-											}`}>
+											<span
+												className={`badge ${
+													item.status === 'VERIFIED'
+														? 'badge-green'
+														: item.status === 'LABELED'
+															? 'badge-teal'
+															: 'badge-slate'
+												}`}
+											>
 												{item.status}
 											</span>
 										</div>
 
 										{/* Item content */}
 										<div className='bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100'>
-											{typeof item.content === 'object' && item.content !== null ? (
+											{typeof item.content === 'object' &&
+											item.content !== null ? (
 												<div className='space-y-1.5'>
 													{Object.entries(item.content).map(([key, value]) => (
 														<div key={key} className='flex gap-2 text-sm'>
-															<span className='font-medium text-slate-600 min-w-28 shrink-0'>{key}:</span>
-															<span className='text-slate-700'>{String(value)}</span>
+															<span className='font-medium text-slate-600 min-w-28 shrink-0'>
+																{key}:
+															</span>
+															<span className='text-slate-700'>
+																{String(value)}
+															</span>
 														</div>
 													))}
 												</div>
@@ -256,7 +281,11 @@ export default function LabelDatasetPage() {
 															className='flex items-center gap-1.5 badge-teal'
 														>
 															{label.user?.image ? (
-																<img src={label.user.image} alt='' className='w-3.5 h-3.5 rounded-full' />
+																<img
+																	src={label.user.image}
+																	alt=''
+																	className='w-3.5 h-3.5 rounded-full'
+																/>
 															) : null}
 															<span>{label.value}</span>
 															{label.userId === userId && (
@@ -284,7 +313,9 @@ export default function LabelDatasetPage() {
 													return (
 														<button
 															key={cls}
-															onClick={() => !alreadyLabeled && submitLabel(item, cls)}
+															onClick={() =>
+																!alreadyLabeled && submitLabel(item, cls)
+															}
 															disabled={item.submitting || alreadyLabeled}
 															className={`px-5 py-2.5 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
 																alreadyLabeled
@@ -306,8 +337,13 @@ export default function LabelDatasetPage() {
 												<input
 													type='text'
 													value={item.labelInput}
-													onChange={e => updateItem(item._id, { labelInput: e.target.value })}
-													onKeyDown={e => e.key === 'Enter' && submitLabel(item, item.labelInput)}
+													onChange={e =>
+														updateItem(item._id, { labelInput: e.target.value })
+													}
+													onKeyDown={e =>
+														e.key === 'Enter' &&
+														submitLabel(item, item.labelInput)
+													}
 													placeholder='Enter a label...'
 													className='input-field flex-1 text-sm'
 													disabled={item.submitting}
@@ -331,7 +367,6 @@ export default function LabelDatasetPage() {
 							);
 						})}
 					</div>
-
 					{/* Pagination */}
 					{pagination && pagination.pages > 1 && (
 						<div className='flex items-center justify-center gap-3 pt-4'>
@@ -343,22 +378,25 @@ export default function LabelDatasetPage() {
 								Previous
 							</button>
 							<div className='flex items-center gap-1.5'>
-								{Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => {
-									const pageNum = i + 1;
-									return (
-										<button
-											key={pageNum}
-											onClick={() => setPage(pageNum)}
-											className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
-												page === pageNum
-													? 'bg-teal-500 text-white'
-													: 'text-slate-600 hover:bg-slate-100'
-											}`}
-										>
-											{pageNum}
-										</button>
-									);
-								})}
+								{Array.from(
+									{ length: Math.min(pagination.pages, 5) },
+									(_, i) => {
+										const pageNum = i + 1;
+										return (
+											<button
+												key={pageNum}
+												onClick={() => setPage(pageNum)}
+												className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
+													page === pageNum
+														? 'bg-teal-500 text-white'
+														: 'text-slate-600 hover:bg-slate-100'
+												}`}
+											>
+												{pageNum}
+											</button>
+										);
+									},
+								)}
 							</div>
 							<button
 								onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}

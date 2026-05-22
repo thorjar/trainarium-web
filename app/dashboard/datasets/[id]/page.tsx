@@ -176,7 +176,9 @@ export default function DatasetDetailPage() {
 								{dataset?.name ?? 'Dataset'}
 							</h1>
 							{dataset?.description && (
-								<p className='text-sm text-slate-500 mt-1'>{dataset.description}</p>
+								<p className='text-sm text-slate-500 mt-1'>
+									{dataset.description}
+								</p>
 							)}
 							<div className='flex items-center gap-2.5 mt-2'>
 								{dataset?.visibility && (
@@ -190,7 +192,9 @@ export default function DatasetDetailPage() {
 						</div>
 						{pagination && (
 							<div className='text-right'>
-								<p className='text-2xl font-bold text-slate-900'>{pagination.total}</p>
+								<p className='text-2xl font-bold text-slate-900'>
+									{pagination.total}
+								</p>
 								<p className='text-xs text-slate-500'>total items</p>
 							</div>
 						)}
@@ -236,18 +240,34 @@ export default function DatasetDetailPage() {
 					) : (
 						<div className='space-y-3'>
 							{items.map(item => (
-								<Card key={item._id} className={statusBadge(item.status) === 'badge-green' ? 'border-green-200' : statusBadge(item.status) === 'badge-teal' ? 'border-teal-200' : ''}>
+								<Card
+									key={item._id}
+									className={
+										statusBadge(item.status) === 'badge-green'
+											? 'border-green-200'
+											: statusBadge(item.status) === 'badge-teal'
+												? 'border-teal-200'
+												: ''
+									}
+								>
 									<CardBody>
 										<div className='flex items-start justify-between gap-4'>
 											<div className='flex-1 min-w-0'>
-												{typeof item.content === 'object' && item.content !== null ? (
+												{typeof item.content === 'object' &&
+												item.content !== null ? (
 													<div className='space-y-1.5'>
-														{Object.entries(item.content).map(([key, value]) => (
-															<div key={key} className='flex gap-2 text-sm'>
-																<span className='font-medium text-slate-600 min-w-28 shrink-0'>{key}:</span>
-																<span className='text-slate-700 break-words'>{String(value)}</span>
-															</div>
-														))}
+														{Object.entries(item.content).map(
+															([key, value]) => (
+																<div key={key} className='flex gap-2 text-sm'>
+																	<span className='font-medium text-slate-600 min-w-28 shrink-0'>
+																		{key}:
+																	</span>
+																	<span className='text-slate-700 break-words'>
+																		{String(value)}
+																	</span>
+																</div>
+															),
+														)}
 													</div>
 												) : (
 													<p className='text-sm text-slate-700 whitespace-pre-wrap break-words'>
@@ -256,7 +276,13 @@ export default function DatasetDetailPage() {
 												)}
 											</div>
 											<span className={statusBadge(item.status)}>
-												{item.status === 'VERIFIED' ? <CheckCircle className='w-3 h-3' /> : item.status === 'LABELED' ? <CheckCircle className='w-3 h-3' /> : <Circle className='w-3 h-3' />}
+												{item.status === 'VERIFIED' ? (
+													<CheckCircle className='w-3 h-3' />
+												) : item.status === 'LABELED' ? (
+													<CheckCircle className='w-3 h-3' />
+												) : (
+													<Circle className='w-3 h-3' />
+												)}
 												{item.status}
 											</span>
 										</div>
@@ -277,22 +303,25 @@ export default function DatasetDetailPage() {
 								Previous
 							</button>
 							<div className='flex items-center gap-1.5'>
-								{Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => {
-									const pageNum = i + 1;
-									return (
-										<button
-											key={pageNum}
-											onClick={() => setPage(pageNum)}
-											className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
-												page === pageNum
-													? 'bg-teal-500 text-white'
-													: 'text-slate-600 hover:bg-slate-100'
-											}`}
-										>
-											{pageNum}
-										</button>
-									);
-								})}
+								{Array.from(
+									{ length: Math.min(pagination.pages, 5) },
+									(_, i) => {
+										const pageNum = i + 1;
+										return (
+											<button
+												key={pageNum}
+												onClick={() => setPage(pageNum)}
+												className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
+													page === pageNum
+														? 'bg-teal-500 text-white'
+														: 'text-slate-600 hover:bg-slate-100'
+												}`}
+											>
+												{pageNum}
+											</button>
+										);
+									},
+								)}
 							</div>
 							<button
 								onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
@@ -313,7 +342,10 @@ export default function DatasetDetailPage() {
 						<Card>
 							<CardHeader title='Invite Member' />
 							<CardBody>
-								<form onSubmit={handleInvite} className='flex flex-col sm:flex-row gap-3'>
+								<form
+									onSubmit={handleInvite}
+									className='flex flex-col sm:flex-row gap-3'
+								>
 									<input
 										type='email'
 										value={inviteEmail}
@@ -329,17 +361,24 @@ export default function DatasetDetailPage() {
 									>
 										<option value='LABELER'>Labeler</option>
 										<option value='VERIFIER'>Verifier</option>
+										<option value='BOTH'>Labeler + Verifier</option>
 									</select>
 									<button
 										type='submit'
 										disabled={inviting}
 										className='btn-primary flex items-center gap-2 disabled:opacity-50'
 									>
-										{inviting ? <Loader className='w-4 h-4 animate-spin' /> : <UserPlus className='w-4 h-4' />}
+										{inviting ? (
+											<Loader className='w-4 h-4 animate-spin' />
+										) : (
+											<UserPlus className='w-4 h-4' />
+										)}
 										Invite
 									</button>
 								</form>
-								{inviteError && <p className='text-red-600 text-sm mt-2'>{inviteError}</p>}
+								{inviteError && (
+									<p className='text-red-600 text-sm mt-2'>{inviteError}</p>
+								)}
 							</CardBody>
 						</Card>
 					)}
@@ -354,10 +393,17 @@ export default function DatasetDetailPage() {
 							) : (
 								<div className='divide-y divide-slate-100'>
 									{members.map((member: Member) => (
-										<div key={member.id} className='flex items-center justify-between px-6 py-4'>
+										<div
+											key={member.id}
+											className='flex items-center justify-between px-6 py-4'
+										>
 											<div className='flex items-center gap-3 min-w-0 flex-1'>
 												{member.user.image ? (
-													<img src={member.user.image} alt='' className='w-9 h-9 rounded-full ring-2 ring-slate-100' />
+													<img
+														src={member.user.image}
+														alt=''
+														className='w-9 h-9 rounded-full ring-2 ring-slate-100'
+													/>
 												) : (
 													<div className='w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-medium text-sm ring-2 ring-teal-50'>
 														{member.user.name?.[0] ?? '?'}
@@ -373,7 +419,9 @@ export default function DatasetDetailPage() {
 												</div>
 											</div>
 											<div className='flex items-center gap-3 flex-shrink-0 ml-4'>
-												<span className='badge-slate text-xs'>{member.role}</span>
+												<span className='badge-slate text-xs'>
+													{member.role}
+												</span>
 												{isOwner && (
 													<button
 														onClick={() => handleRemoveMember(member.user.id)}
@@ -404,9 +452,24 @@ export default function DatasetDetailPage() {
 							</label>
 							<div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
 								{[
-									{ value: 'PRIVATE', label: 'Private', icon: Lock, desc: 'Only you' },
-									{ value: 'TEAM', label: 'Team', icon: Users, desc: 'Invited members' },
-									{ value: 'PUBLIC', label: 'Public', icon: Globe, desc: 'Anyone' },
+									{
+										value: 'PRIVATE',
+										label: 'Private',
+										icon: Lock,
+										desc: 'Only you',
+									},
+									{
+										value: 'TEAM',
+										label: 'Team',
+										icon: Users,
+										desc: 'Invited members',
+									},
+									{
+										value: 'PUBLIC',
+										label: 'Public',
+										icon: Globe,
+										desc: 'Anyone',
+									},
 								].map(opt => {
 									const Icon = opt.icon;
 									const isVisActive = visibility === opt.value;
@@ -421,8 +484,12 @@ export default function DatasetDetailPage() {
 													: 'border-slate-200 hover:border-slate-300 bg-white'
 											}`}
 										>
-											<Icon className={`w-5 h-5 mb-2 ${isVisActive ? 'text-teal-600' : 'text-slate-400'}`} />
-											<div className='font-medium text-sm text-slate-900'>{opt.label}</div>
+											<Icon
+												className={`w-5 h-5 mb-2 ${isVisActive ? 'text-teal-600' : 'text-slate-400'}`}
+											/>
+											<div className='font-medium text-sm text-slate-900'>
+												{opt.label}
+											</div>
 											<div className='text-xs text-slate-500'>{opt.desc}</div>
 										</button>
 									);
@@ -434,7 +501,11 @@ export default function DatasetDetailPage() {
 							disabled={savingSettings}
 							className='btn-primary flex items-center gap-2 disabled:opacity-50'
 						>
-							{savingSettings ? <Loader className='w-4 h-4 animate-spin' /> : <Settings className='w-4 h-4' />}
+							{savingSettings ? (
+								<Loader className='w-4 h-4 animate-spin' />
+							) : (
+								<Settings className='w-4 h-4' />
+							)}
 							Save Settings
 						</button>
 					</CardBody>
