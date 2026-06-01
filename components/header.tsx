@@ -37,7 +37,7 @@ export function Header() {
 						<img
 							src='/logo-header.png'
 							alt='Trainarium'
-							className='h-8 sm:h-9 w-auto'
+							className='h-8 sm:h-12 w-auto'
 						/>
 					</Link>
 

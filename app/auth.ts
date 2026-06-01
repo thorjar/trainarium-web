@@ -4,6 +4,23 @@ import Google from 'next-auth/providers/google';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+async function refreshApiToken(currentToken: string): Promise<string | null> {
+	try {
+		const res = await fetch(`${API_URL}/api/auth/refresh`, {
+			method: 'POST',
+			headers: { Authorization: `Bearer ${currentToken}` },
+		});
+		if (!res.ok) return null;
+		const data = await res.json();
+		return data.token ?? null;
+	} catch {
+		return null;
+	}
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	providers: [
 		Google({
@@ -36,7 +53,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 					const data = await response.json();
 
-					// This maps cleanly to the extended User interface defined in next-auth.d.ts
 					return {
 						id: data.user.id,
 						email: data.user.email,
@@ -50,19 +66,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			},
 		}),
 	],
+
 	pages: {
 		signIn: '/auth/login',
 		error: '/auth/error',
 	},
+
 	callbacks: {
 		async jwt({ token, user, account }) {
-			// On initial credentials sign-in
+			// ── Initial credentials sign-in ──────────────────────────────────────
 			if (user) {
 				token.id = user.id;
-				token.apiToken = user.apiToken; // Clean assignment, no "as any" bypass needed
+				token.apiToken = user.apiToken;
+				token.apiTokenExpiry = Date.now() + SEVEN_DAYS_MS;
 			}
 
-			// On OAuth sign-in — sync with backend
+			// ── Initial Google sign-in — sync with backend ───────────────────────
 			if (account?.provider === 'google') {
 				try {
 					const response = await fetch(`${API_URL}/api/auth/sync-user`, {
@@ -79,9 +98,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						const data = await response.json();
 						token.id = data.user.id;
 						token.apiToken = data.token;
+						token.apiTokenExpiry = Date.now() + SEVEN_DAYS_MS;
 					}
 				} catch (error) {
 					console.error('Failed to sync user with backend:', error);
+				}
+			}
+
+			// ── Refresh API token if within 1 day of expiry ──────────────────────
+			// Runs on every session access after initial sign-in.
+			// Silently re-issues the Express JWT so users never hit token expiry errors.
+			const expiry = token.apiTokenExpiry as number | undefined;
+			const currentApiToken = token.apiToken as string | undefined;
+
+			if (expiry && currentApiToken && expiry - Date.now() < ONE_DAY_MS) {
+				const refreshed = await refreshApiToken(currentApiToken);
+				if (refreshed) {
+					token.apiToken = refreshed;
+					token.apiTokenExpiry = Date.now() + SEVEN_DAYS_MS;
+				} else {
+					// Refresh failed — clear token to trigger 401 → sign-out flow
+					token.apiToken = undefined;
+					token.apiTokenExpiry = undefined;
 				}
 			}
 
@@ -92,14 +130,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			if (session.user) {
 				session.user.id = token.id as string;
 			}
-			// TypeScript safely reads this from the augmented module definitions now
 			session.apiToken = token.apiToken;
 			return session;
 		},
 	},
+
 	session: {
 		strategy: 'jwt',
-		maxAge: 30 * 24 * 60 * 60,
+		maxAge: 7 * 24 * 60 * 60, // 7 days — synced with Express JWT lifetime
 	},
+
 	secret: process.env.NEXTAUTH_SECRET,
 });
