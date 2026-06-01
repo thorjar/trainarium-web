@@ -1,4 +1,3 @@
-import React from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/header';
 import { Book, Workflow, CheckCircle, ArrowLeft } from 'lucide-react';
